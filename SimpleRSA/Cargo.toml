@@ -1,9 +1,9 @@
 [package]
-name = "SimpleRSA"
+name = "rsa_project"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-rsa = "0.5.0"  # For RSA encryption/decryption
-rand = "0.8"    # For generating random numbers (used in key generation)
-base64 = "0.21" # Optional, for encoding the output as base64
+rsa = "0.9"
+rand = "0.8"
+base64 = "0.21" # For encoding/decoding encrypted data
