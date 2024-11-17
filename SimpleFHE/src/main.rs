@@ -1,81 +1,64 @@
+use rand::{Rng, thread_rng};
+
+#[derive(Clone)] // Add Clone derive
+struct LWEParams {
+    n: usize,        // dimension of the secret key
+    q: i64,          // modulus
+    noise_bound: i64 // bound for noise
+}
+
+struct KeyPair {
+    secret_key: Vec<i64>,  // s in {0,1}^n
+    public_params: LWEParams
+}
+
+struct Ciphertext {
+    a: Vec<i64>,  // random vector
+    b: i64        // dot product + message + noise
+}
+
+// Rest of the implementations remain the same...
+
 fn main() {
-    // Simple RSA parameters
-    let p: i64 = 61; // A prime number
-    let q: i64 = 53; // Another prime number
-    let n: i64 = p * q; // Modulus for public key
-    let e: i64 = 17; // Public exponent
-    let phi: i64 = (p - 1) * (q - 1);
-    let d: i64 = mod_inverse(e, phi).unwrap(); // Private exponent
-
-    // Example plaintext values
-    let plaintext1: i64 = 10;
-    let plaintext2: i64 = 15;
-
-    // Encrypt the values
-    let encrypted1 = encrypt(plaintext1, e, n);
-    let encrypted2 = encrypt(plaintext2, e, n);
-
-    // Perform homomorphic addition
-    let encrypted_sum = (encrypted1 * encrypted2) % n;
-
-    // Decrypt the result
-    let decrypted_sum = decrypt(encrypted_sum, d, n);
-
-    // Print the results
-    println!("Decrypted Sum: {}", decrypted_sum);
-}
-
-// Encrypt a plaintext using public key
-fn encrypt(plaintext: i64, e: i64, n: i64) -> i64 {
-    mod_exp(plaintext, e, n)
-}
-
-// Decrypt a ciphertext using private key
-fn decrypt(ciphertext: i64, d: i64, n: i64) -> i64 {
-    mod_exp(ciphertext, d, n)
-}
-
-// Modular exponentiation
-fn mod_exp(base: i64, exp: i64, modulus: i64) -> i64 {
-    let mut result = 1;
-    let mut b = base % modulus;
-    let mut e = exp;
-    while e > 0 {
-        if e % 2 == 1 { // If e is odd
-            result = (result * b) % modulus;
+    // Set parameters
+    let params = LWEParams {
+        n: 100,           // dimension
+        q: 1 << 16,       // modulus (2^16)
+        noise_bound: 4    // small noise bound
+    };
+    
+    let key_pair = KeyPair::new(params.clone()); // Clone params here
+    
+    // Test encryption and decryption
+    println!("Testing single encryption/decryption:");
+    for m in 0..5 {
+        let ct = key_pair.encrypt(m);
+        let decrypted = key_pair.decrypt(&ct);
+        println!("Original: {}, Decrypted: {}", m, decrypted);
+    }
+    
+    // Test homomorphic addition
+    println!("\nTesting homomorphic addition:");
+    let m1 = 3;
+    let m2 = 2;
+    
+    let ct1 = key_pair.encrypt(m1);
+    let ct2 = key_pair.encrypt(m2);
+    
+    let ct_sum = add_ciphertexts(&ct1, &ct2, params.q); // Now params is still available
+    let sum_decrypted = key_pair.decrypt(&ct_sum);
+    
+    println!("{} + {} = {}", m1, m2, sum_decrypted);
+    
+    // Test range of values
+    println!("\nTesting value range:");
+    for i in 0..3 {
+        for j in 0..3 {
+            let ct_i = key_pair.encrypt(i);
+            let ct_j = key_pair.encrypt(j);
+            let ct_sum = add_ciphertexts(&ct_i, &ct_j, params.q);
+            let sum = key_pair.decrypt(&ct_sum);
+            println!("{} + {} = {}", i, j, sum);
         }
-        b = (b * b) % modulus; // Square the base
-        e /= 2; // Divide the exponent by 2
     }
-    result
-}
-
-// Compute the modular inverse using the Extended Euclidean Algorithm
-fn mod_inverse(a: i64, m: i64) -> Option<i64> {
-    let mut m0 = m;
-    let mut y: i64 = 0;
-    let mut x: i64 = 1;
-
-    if m == 1 {
-        return Some(0);
-    }
-
-    let mut a = a % m;
-    while a > 1 {
-        let q = a / m0;
-        let t = m0;
-
-        m0 = a % m0;
-        a = t;
-
-        let t = y;
-        y = x - q * y;
-        x = t;
-    }
-
-    if x < 0 {
-        x += m;
-    }
-
-    Some(x)
 }
