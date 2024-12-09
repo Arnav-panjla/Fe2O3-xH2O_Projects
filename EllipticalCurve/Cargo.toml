@@ -4,3 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+secp256k1 = "0.30.0"
+sha2 = "0.10.6"
+hex = "0.4"
+

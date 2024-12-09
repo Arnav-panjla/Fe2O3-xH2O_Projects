@@ -4,6 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-rsa = "0.9"
-rand = "0.8"
-base64 = "0.21" # For encoding/decoding encrypted data
+rand = "0.8.5"
+num-bigint = "0.4.3"
+num-traits = "0.2.15"
