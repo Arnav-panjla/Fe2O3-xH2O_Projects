@@ -1,60 +1,75 @@
-use rand::Rng;
+/*
+secret = 1234
+n = 6
+k = 3
+a1 = 166 // Polynomial coefficient
+a2 = 94 // Polynomial coefficient
+f(x) = 1234 + 166X + 94X**2 // Polynomial
+modulo = 1613
 
-// Generate shares using Shamir's Secret Sharing
-fn generate_shares(secret: u32, n: usize, k: usize) -> Vec<(usize, u32)> {
-    let mut rng = rand::thread_rng();
-    let mut coefficients = vec![secret];
-    for _ in 1..k {
-        coefficients.push(rng.gen_range(0..10000));
+*/
+
+use lambdaworks_math::{
+    field::element::FieldElement,
+    polynomial::Polynomial,
+};
+
+fn main () {
+
+    use lambdaworks_math::field::fields::u64_prime_field::U64PrimeField; 
+
+    const ORDER: u64 = 1613; // Defining modulo
+    type F = U64PrimeField<ORDER>;
+    type FE = FieldElement<F>;
+
+    let secret = FE::new(1234);
+    let threshold = 3;
+    let secret_p = 1234;
+
+    // Polynomial:
+
+    fn polynomial_f() -> Polynomial<FE> {
+        Polynomial::new(&[FE::new(1234), FE::new(166), FE::new(94)])
     }
 
-    (1..=n)
-        .map(|i| {
-            let mut share = 0;
-            for (j, coeff) in coefficients.iter().enumerate() {
-                share += coeff * (i as u32).pow(j as u32);
-            }
-            (i, share)
-        })
-        .collect()
-}
+    // Defining shares:
 
-// Reconstruct the secret using Lagrange interpolation
-fn reconstruct_secret(shares: &[(usize, u32)], k: usize) -> u32 {
-    let mut secret = 0;
+    fn defining_shares (a: FE) -> FE {
+        let result = polynomial_f().evaluate(&a);
+        return result;
+    }
 
-    for i in 0..k {
-        let (xi, yi) = shares[i];
-        let mut numerator = 1;
-        let mut denominator = 1;
+    // Reconstructing the secret using a subset of shares:
 
-        for j in 0..k {
+    let subset_shares: Vec<(FE, FE)> = vec! [
+        (FE::new(1), defining_shares(FE::new(1))),
+        (FE::new(2), defining_shares(FE::new(2))),
+        (FE::new(3), defining_shares(FE::new(3)))];    
+
+    let mut reconstructed_secret = FE::new(0);
+
+    for i in 0..threshold {
+        
+        let (x_i, y_i) = subset_shares[i];
+
+        let mut numerator: FE = FE::new(1);
+        let mut denominator: FE = FE::new(1);
+        for j in 0..threshold {
             if i != j {
-                let (xj, _) = shares[j];
-                numerator *= xj as u32;
-                denominator *= xj as u32 - xi as u32;
+                let (x_j, _) = subset_shares[j];
+                numerator = numerator * (- x_j);
+                denominator = denominator * (x_i - x_j);
             }
         }
-
-        secret += yi * numerator / denominator;
+        
+        let pow_result = denominator.pow(1611_u64);
+        reconstructed_secret = reconstructed_secret + (y_i * numerator * pow_result);        
+        
     }
 
-    secret
-}
+    if reconstructed_secret == secret {
+        println!("Verified!");
+        println!("The secret is: {}", secret_p);
+    }
 
-fn main() {
-    let secret = 1234; // The secret to be shared
-    let n = 5;         // Number of shares
-    let k = 3;         // Threshold for reconstruction
-
-    // Generate shares
-    let shares = generate_shares(secret, n, k);
-    println!("Generated Shares: {:?}", shares);
-
-    // Select k shares to reconstruct the secret
-    let selected_shares = &shares[0..k];
-    let reconstructed_secret = reconstruct_secret(selected_shares, k);
-    println!("Reconstructed Secret: {}", reconstructed_secret);
-
-    assert_eq!(secret, reconstructed_secret);
 }
