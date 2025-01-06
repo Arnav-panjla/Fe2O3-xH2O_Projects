@@ -4,38 +4,29 @@ Welcome to my **Cryptographic Projects** repository! Here, I showcase various cr
 
 ## Projects Overview 📄
 
-### 1. **Simple FHE (Fully Homomorphic Encryption) 🔒**
-   An implementation of **Fully Homomorphic Encryption (FHE)** in Rust. FHE allows computations to be performed on encrypted data without decrypting it, ensuring privacy while processing sensitive information.
-### 2. **Simple RSA Encryption 🔑**
-   A simple implementation of the **RSA encryption** algorithm in Rust. RSA is a widely used public-key encryption scheme that is fundamental to modern cryptographic systems.
-
-
-### 3. **Simple FHE-LWE (Learning With Errors) 🔐**
-   This project implements a basic version of **FHE-LWE (Learning With Errors)**, a cryptographic construction used for creating homomorphic encryption schemes with greater security guarantees.
+### 1. Simple FHE, RSA, FHE-LWE
+   This project provides simple implementations of Fully Homomorphic Encryption (FHE), RSA encryption, and FHE-LWE, demonstrating secure data processing, communication, and advanced cryptographic techniques for privacy protection.
    
-### 4. **Shamir’s Secret Sharing 🗝️**
+### 2. **Shamir’s Secret Sharing 🗝️**
    A Rust implementation of **Shamir’s Secret Sharing** scheme, which allows a secret to be divided into multiple parts, requiring a threshold of parts to reconstruct the secret.
 
    - **Key Features**: Split secrets, reconstruct secrets from shares, and threshold-based sharing.
    - **Use Case**: Secure key management, distributed systems, and multi-party computation.
 
-### 5. **Blockchain Implementation ⛓️**
-   A basic implementation of a **Blockchain** in Rust. This project models the structure of a blockchain, enabling the creation of blocks, linking them together, and verifying the integrity of the chain.
 
-   - **Key Features**: Block creation, chain management, hash validation, and proof-of-work algorithm.
-   - **Use Case**: Cryptocurrencies, distributed ledgers, and decentralized applications.
-
-### 6. **Elliptic Curve Cryptography (ECC) 🔒**
+### 3. **Elliptic Curve Cryptography (ECC) 🔒**
    An implementation of **Elliptic Curve Cryptography (ECC)** in Rust. ECC is an advanced public-key cryptosystem that provides high security with smaller key sizes compared to RSA.
 
    - **Key Features**: Key generation, signature generation and verification, encryption, and decryption using elliptic curves.
    - **Use Case**: Secure communication, digital signatures, and modern encryption systems.
 
-### 7. **STARK101 (Zero-Knowledge Proofs) 🔍**
-   A basic implementation of **STARKs (Scalable Transparent Arguments of Knowledge)** in Rust. STARKs are a class of cryptographic proofs that allow for efficient verification of computations, with no trusted setup required.
+### 4. **BLS signature**
+   Implemented BLS signature in rust, using arkworks ecosystem and using the curve bls12_381.
 
-   - **Key Features**: Implementation of basic STARK protocols for proving knowledge without revealing any sensitive data.
-   - **Use Case**: Scalable and transparent cryptographic proofs for blockchain, privacy-preserving systems, and secure computation.
+### 5. **Rivest Cipher 4 (RC4)**
+   software implementation of stream cipher RC4, cryptographically insecure, via exhaustive search attacks.
+
+
 
 
 ## Some future ideas
